@@ -48,6 +48,21 @@ public class UserDAO {
     }
     return null;
     }
+
+    //Method for confirming password with username
+    public String getPasswordByUsername(String username) throws SQLException {
+        String query = "SELECT password FROM users WHERE username = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, username);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("password");
+                }
+            }
+        }
+        return null;
+    }
 }
 
 
