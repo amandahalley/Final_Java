@@ -48,6 +48,20 @@ public class UserDAO {
     }
     return null;
     }
+
+    //Get password hash for validation
+    public String getPasswordByUsername(String username) throws SQLException {
+        String query = "SELECT password FROM users WHERE username = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, username);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("password");
+                }
+            }
+        }
+        return null;
+    }
 }
 
 
