@@ -14,11 +14,16 @@ public class UserService {
 
     }
     //Register user with encrypted password
-    public void registerUser(String username, String email, String password, String role) throws SQLException {
-        //hash password before storing it
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-        userDAO.registerUser(username, email, hashedPassword, role);
+    public void registerUser(User user) throws SQLException {
+       try{
+           userDAO.registerUser(user);
+           System.out.println("User successfully created");
+       } catch (IllegalArgumentException e) {
+           System.out.println("Error registering user: " + e.getMessage());
+       }
     }
+
+
 
     //Login by verifying password
     public User login(String username, String password) throws SQLException {

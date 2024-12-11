@@ -7,6 +7,7 @@ import com.ecommerce.User;
 import com.ecommerce.Product;
 import database.DatabaseConnection;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,16 +20,26 @@ public class UserDAO {
     }
 
    //Method for registering a user
-    public void registerUser(String username, String email, String password, String role) throws SQLException {
-        String sql = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, username);
-            statement.setString(2, email);
-            statement.setString(3, password);
-            statement.setString(4, role);
-            statement.executeUpdate();
-        }
-    }
+   public void registerUser(User user) throws SQLException {
+       String sql = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
+
+       //get the database connection
+       try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+           //set the parameters
+           preparedStatement.setString(1, user.getUsername());  // Assuming User has a getUsername() method
+           preparedStatement.setString(2, user.getEmail());     // Assuming User has a getEmail() method
+           preparedStatement.setString(3, user.getPassword());  // Assuming User has a getPassword() method
+           preparedStatement.setString(4, user.getRole());      // Assuming User has a getRole() method
+
+           //insert the user
+           preparedStatement.executeUpdate();
+       } catch (SQLException e) {
+           //handle any SQLExceptions
+           throw new SQLException("Error inserting user into database.", e);
+       }
+   }
 
 
     //Method for finding a user by username for login
@@ -42,8 +53,8 @@ public class UserDAO {
             String email = resultSet.getString("email");
             String role = resultSet.getString("role");
             if ("buyer".equals(role)) return new Buyer(id, username, email);
-            if ("seller".equals(role)) return new Buyer(id, username, email);
-            if ("admin".equals(role)) return new Buyer(id, username, email);
+            if ("seller".equals(role)) return new Seller(id, username, email);
+            if ("admin".equals(role)) return new Admin(id, username, email);
 
         }
     }
@@ -52,8 +63,8 @@ public class UserDAO {
 
     //Get password hash for validation
     public String getPasswordByUsername(String username) throws SQLException {
-        String query = "SELECT password FROM users WHERE username = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        String sql = "SELECT password FROM users WHERE username = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, username);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -67,28 +78,68 @@ public class UserDAO {
 
     public List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<>();
-        String query = "SELECT id, username, email, role FROM users";
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
+        String sql = "SELECT * FROM users";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ResultSet resultSet = preparedStatement.executeQuery()) {
+
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String username = resultSet.getString("username");
-                String email = resultSet.getString("email");
-                String role = resultSet.getString("role");
-                if ("buyer".equals(role)) users.add(new Buyer(id, username, email));
-                if ("seller".equals(role)) users.add(new Seller(id, username, email));
-                if ("admin".equals(role)) users.add(new Admin(id, username, email));
+                User user = new User (
+                        resultSet.getInt("user_id"),
+                        resultSet.getString("username"),
+                        resultSet.getString("email"),
+                        resultSet.getString("password"),
+                        resultSet.getString("role")
+                );
+                users.add(user);
             }
         }
         return users;
     }
 
+    //get user by email
+    public User getUserByEmail(String email) throws SQLException {
+        if (email.isEmpty()) {
+            throw new IllegalArgumentException("Email can not be empty.");
+        }
+        String sql = "SELECT users WHERE user_email = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+             preparedStatement.setString(1, email);
+
+             ResultSet resultSet = preparedStatement.executeQuery();
+
+             if (resultSet.next()) {
+                 return new User(
+                         resultSet.getInt("user_id"),
+                         resultSet.getString("username"),
+                         resultSet.getString("email"),
+                         resultSet.getString("password"),
+                         resultSet.getString("role")
+                 );
+             }
+
+             }
+             System.out.println("No user was found with the email" + email);
+             return null;
+    }
+
     // Delete a user from system
-    public boolean deleteUserById(int userId) throws SQLException {
-        String query = "DELETE FROM users WHERE id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, userId);
-            return statement.executeUpdate() > 0;
+    public boolean deleteUserById(int user_id) throws SQLException {
+        String sql = "DELETE FROM users WHERE id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, user_id);
+            int userDeleted = preparedStatement.executeUpdate();
+            if (userDeleted > 0) {
+                System.out.println("User with ID " + user_id + " has been deleted successfully.");
+                return true;
+            } else {
+                System.out.println("No user with the ID: " + user_id + "was found, please try again.");
+                return false;
+            }
         }
     }
 
