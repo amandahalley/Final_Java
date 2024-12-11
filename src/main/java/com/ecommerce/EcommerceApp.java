@@ -7,6 +7,7 @@ import DAO.UserDAO;
 
 // Import database connection
 import database.DatabaseConnection;
+import database.DatabaseInitializer;
 
 // Import services
 import service.ProductService;
@@ -27,6 +28,9 @@ public class EcommerceApp {
             // Initialize DAOs
             UserDAO userDAO = new UserDAO(connection);
             ProductDAO productDAO = new ProductDAO(connection);
+            // Initialize database and insert default data
+            DatabaseInitializer.initializeDatabase(connection);
+            DatabaseInitializer.insertDefaultData(connection);
 
             // Initialize Services
             UserService userService = new UserService(userDAO);
