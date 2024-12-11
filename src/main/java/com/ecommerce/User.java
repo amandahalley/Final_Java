@@ -1,6 +1,6 @@
 package com.ecommerce;
 
-public abstract class User {
+public class User {
     private int id;
     private String username;
     private String email;
@@ -8,9 +8,10 @@ public abstract class User {
     private String role;
 
     //Constructor
-    public User(String username, String email, String role, String admin) {
-        this.id = this.id;
+    public User(int id, String username, String password, String email, String role) {
+        this.id = Integer.parseInt(id);
         this.username = username;
+        this.password = password;
         this.email = email;
         this.role = role;
     }
