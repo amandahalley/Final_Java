@@ -7,6 +7,7 @@ import com.ecommerce.User;
 import com.ecommerce.Product;
 import database.DatabaseConnection;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,13 +82,14 @@ public class UserDAO {
 
         try (Connection connection = DatabaseConnection.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-        ResultSet resultSet = preparedStatement.executeQuery() {
+        ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 User user = new User (
                         resultSet.getInt("user_id"),
                         resultSet.getString("username"),
                         resultSet.getString("email"),
+                        resultSet.getString("password"),
                         resultSet.getString("role")
                 );
                 users.add(user);
@@ -97,11 +99,19 @@ public class UserDAO {
     }
 
     // Delete a user from system
-    public boolean deleteUserById(int userId) throws SQLException {
+    public boolean deleteUserById(int user_id) throws SQLException {
         String sql = "DELETE FROM users WHERE id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, userId);
-            return statement.executeUpdate() > 0;
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, user_id);
+            int userDeleted = preparedStatement.executeUpdate();
+            if (userDeleted > 0) {
+                System.out.println("User with ID " + user_id + " has been deleted successfully.");
+                return true;
+            } else {
+                System.out.println("No user with the ID: " + user_id + "was found, please try again.");
+                return false;
+            }
         }
     }
 
