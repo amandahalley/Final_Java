@@ -78,10 +78,10 @@ public class UserDAO {
 
     public List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM users";
+        String sql = "SELECT * FROM users";
 
         try (Connection connection = DatabaseConnection.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
         ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
@@ -96,6 +96,34 @@ public class UserDAO {
             }
         }
         return users;
+    }
+
+    //get user by email
+    public User getUserByEmail(String email) throws SQLException {
+        if (email.isEmpty()) {
+            throw new IllegalArgumentException("Email can not be empty.");
+        }
+        String sql = "SELECT users WHERE user_email = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+             preparedStatement.setString(1, email);
+
+             ResultSet resultSet = preparedStatement.executeQuery();
+
+             if (resultSet.next()) {
+                 return new User(
+                         resultSet.getInt("user_id"),
+                         resultSet.getString("username"),
+                         resultSet.getString("email"),
+                         resultSet.getString("password"),
+                         resultSet.getString("role")
+                 );
+             }
+
+             }
+             System.out.println("No user was found with the email" + email);
+             return null;
     }
 
     // Delete a user from system
