@@ -1,45 +1,48 @@
 package DAO;
 
+
 import com.ecommerce.Admin;
 import com.ecommerce.Buyer;
 import com.ecommerce.Seller;
 import com.ecommerce.User;
-import com.ecommerce.Product;
 import database.DatabaseConnection;
-
-import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDAO {
-    private Connection connection;
+    private final Connection connection;
 
-    public UserDAO(Connection connection) {
-        this.connection = connection;
+    public UserDAO() {
+        try {
+            this.connection = DatabaseConnection.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to connect.", e);
+        }
+
     }
 
    //Method for registering a user
    public void registerUser(User user) throws SQLException {
-       String sql = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
+       String sql = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?::user_role) RETURNING user_id";
 
        //get the database connection
-       try (Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+       try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
            //set the parameters
-           preparedStatement.setString(1, user.getUsername());  // Assuming User has a getUsername() method
-           preparedStatement.setString(2, user.getEmail());     // Assuming User has a getEmail() method
-           preparedStatement.setString(3, user.getPassword());  // Assuming User has a getPassword() method
-           preparedStatement.setString(4, user.getRole());      // Assuming User has a getRole() method
+           preparedStatement.setString(1, user.getUsername());
+           preparedStatement.setString(2, user.getEmail());
+           preparedStatement.setString(3, user.getPassword());
+           preparedStatement.setString(4, user.getRole());
 
-           //insert the user
-           preparedStatement.executeUpdate();
-       } catch (SQLException e) {
-           //handle any SQLExceptions
-           throw new SQLException("Error inserting user into database.", e);
+           ResultSet rs = preparedStatement.executeQuery();
+           if (rs.next()) {
+               user.setId(rs.getInt("user_id"));
+           }
        }
    }
+
+
 
 
     //Method for finding a user by username for login
