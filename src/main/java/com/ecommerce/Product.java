@@ -16,6 +16,9 @@ public class Product {
         this.seller_id = seller_id;
     }
 
+    public Product(int id, String name, double price, int quantity, String sellerName, String sellerEmail) {
+    }
+
     //Getters
     public int getId() {
         return id;

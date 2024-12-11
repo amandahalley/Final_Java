@@ -51,4 +51,40 @@ public class ProductDAO {
             return stmt.executeUpdate() > 0;
         }
     }
+
+    // updates name, price, quantity of a product only if it belongs to seller.
+    public boolean updateProduct(Product product) throws SQLException {
+        String query = "UPDATE Products SET name = ?, price = ?, quantity = ? WHERE id = ? AND seller_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, product.getName());
+            stmt.setDouble(2, product.getPrice());
+            stmt.setInt(3, product.getQuantity());
+            stmt.setInt(4, product.getId());
+            stmt.setInt(5, product.getSeller_id());
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    // fetches products associated with a specific seller.
+    public List<Product> getProductsBySeller(int sellerId) throws SQLException {
+        List<Product> products = new ArrayList<>();
+        String query = "SELECT * FROM Products WHERE seller_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, sellerId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Product product = new Product(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getDouble("price"),
+                            rs.getInt("quantity"),
+                            rs.getInt("seller_id")
+                    );
+                    products.add(product);
+                }
+            }
+        }
+        return products;
+    }
 }
+
