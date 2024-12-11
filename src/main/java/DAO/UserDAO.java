@@ -27,7 +27,8 @@ public class UserDAO {
        String sql = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?::user_role) RETURNING user_id";
 
        //get the database connection
-       try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+       try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
 
            //set the parameters
            preparedStatement.setString(1, user.getUsername());
@@ -35,15 +36,10 @@ public class UserDAO {
            preparedStatement.setString(3, user.getPassword());
            preparedStatement.setString(4, user.getRole());
 
-           ResultSet rs = preparedStatement.executeQuery();
-           if (rs.next()) {
-               user.setId(rs.getInt("user_id"));
+           preparedStatement.executeUpdate();
            }
        }
    }
-
-
-
 
     //Method for finding a user by username for login
     public User getUserByUsername(String username) throws SQLException {
@@ -79,7 +75,7 @@ public class UserDAO {
     }
 
 
-    public List<User> getAllUsers() throws SQLException {
+    public static List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM users";
 
@@ -128,6 +124,34 @@ public class UserDAO {
              System.out.println("No user was found with the email" + email);
              return null;
     }
+
+    //get user by id
+    public User getUserById(String user_id) throws SQLException {
+    if (user_id.isEmpty()) {
+        throw new IllegalArgumentException("Id can not be empty.");
+    }
+    String sql = "SELECT users WHERE user_id = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+    PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        preparedStatement.setString(1, user_id);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        if (resultSet.next()) {
+            return new User(
+                    resultSet.getInt("user_id"),
+                    resultSet.getString("username"),
+                    resultSet.getString("email"),
+                    resultSet.getString("password"),
+                    resultSet.getString("role")
+            );
+        }
+
+    }
+             System.out.println("No user was found with the ID " + user_id);
+             return null;
+
 
     // Delete a user from system
     public boolean deleteUserById(int user_id) throws SQLException {
