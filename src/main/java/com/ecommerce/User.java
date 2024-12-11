@@ -8,8 +8,8 @@ public abstract class User {
     private String role;
 
     //Constructor
-    public User(String username, String email, String role, String admin) {
-        this.id = this.id;
+    public User(String id, String username, String email, String role) {
+        this.id = Integer.parseInt(id);
         this.username = username;
         this.email = email;
         this.role = role;
