@@ -52,6 +52,7 @@ public class EcommerceApp {
                 int choice = scanner.nextInt();
                 scanner.nextLine(); // Consume newline character
 
+
                 switch (choice) {
                     case 1: // Register
                         System.out.print("Enter username: ");
@@ -62,18 +63,19 @@ public class EcommerceApp {
                         String password = scanner.nextLine();
                         System.out.print("Enter role (buyer/seller/admin): ");
                         String role = scanner.nextLine();
+                        int id = 0;
 
                         // Create a User object based on the role
                         User newUser;
                         switch (role.toLowerCase()) {
                             case "buyer":
-                                newUser = new Buyer(username, password, email, role);
+                                newUser = new Buyer(id, username, password, email);
                                 break;
                             case "seller":
-                                newUser = new Seller(username, password, email, role);
+                                newUser = new Seller(id, username, password, email);
                                 break;
                             case "admin":
-                                newUser = new Admin(username, password, email, role);
+                                newUser = new Admin(id, username, password, email);
                                 break;
                             default:
                                 System.out.println("Invalid role! Registration failed.");

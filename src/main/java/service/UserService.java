@@ -6,6 +6,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Scanner;
 
 public class UserService {
     private final UserDAO userDAO;
@@ -65,5 +66,6 @@ public class UserService {
             throw new SQLException("Error occurred while deleting user: " + e.getMessage(), e);
         }
     }
+
 
 }
