@@ -1,0 +1,29 @@
+CREATING TABLES
+
+CREATE TABLE Users (
+id SERIAL PRIMARY KEY,
+username VARCHAR NOT NULL UNIQUE,
+password VARCHAR NOT NULL,
+email VARCHAR NOT NULL UNIQUE,
+role VARCHAR NOT NULL
+)
+
+
+CREATE TABLE Users (
+id SERIAL PRIMARY KEY,
+username VARCHAR NOT NULL UNIQUE,
+password VARCHAR NOT NULL,
+email VARCHAR NOT NULL UNIQUE,
+role VARCHAR NOT NULL
+)
+
+SAMPLE INFO
+
+INSERT INTO users (username, password, email, role) VALUES
+('sell1', 'password', 'sell1@example.com', 'Seller'),
+('buy1', 'password', 'buy1@example.com', 'Buyer'),
+('admin1', 'password', 'admin1@example.com', 'Admin');
+
+INSERT INTO products (name, price, quantity, seller_id) VALUES
+('Laptop', 1200.00, 5, 1)
+('Phone', 800.00, 5, 1);
