@@ -23,10 +23,11 @@ import java.util.logging.Logger;
 public class EcommerceApp {
     private static final Logger logger = Logger.getLogger(EcommerceApp.class.getName());
 
+
     public static void main(String[] args) {
         try (Connection connection = DatabaseConnection.getConnection()) {
             // Initialize DAOs
-            UserDAO userDAO = new UserDAO(connection);
+            UserDAO userDAO = new UserDAO();
             ProductDAO productDAO = new ProductDAO(connection);
             // Initialize database and insert default data
             DatabaseInitializer.initializeDatabase(connection);
@@ -66,13 +67,13 @@ public class EcommerceApp {
                         User newUser;
                         switch (role.toLowerCase()) {
                             case "buyer":
-                                newUser = new Buyer(username, password, email);
+                                newUser = new Buyer(username, password, email, role);
                                 break;
                             case "seller":
-                                newUser = new Seller(username, password, email);
+                                newUser = new Seller(username, password, email, role);
                                 break;
                             case "admin":
-                                newUser = new Admin(username, password, email);
+                                newUser = new Admin(username, password, email, role);
                                 break;
                             default:
                                 System.out.println("Invalid role! Registration failed.");
@@ -89,7 +90,7 @@ public class EcommerceApp {
                         break;
                     case 2:
                         // Handle login and provide role-based access
-                        User loggedInUser = userService.loginUser(scanner);
+                        User loggedInUser = userService.loginUser();
                         if (loggedInUser != null) {
                             handleRoleBasedAccess(scanner, loggedInUser, productService);
                         }
