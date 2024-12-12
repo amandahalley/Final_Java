@@ -26,18 +26,28 @@ public class UserService {
     }
 
     //Login by verifying password
-    public User loginUser(String username, String password) throws SQLException {
-        //Fetch user from database
-        User user = userDAO.getUserByUsername(username);
-        if (user != null) {
-            String storedPassword = userDAO.getPasswordByUsername(username);
-            //Verify
-            if (BCrypt.checkpw(password, storedPassword)) {
-                return user;
-            }
+    public User loginUser(String username, String password) throws SQLException{
+        if(username == null || password == null){
+            System.out.println("The User Does Not Exist");
         }
-        return null;
+
+        User user = userDAO.getUserByUsername(username);
+
+        if(user == null){
+            System.out.println("The User Does Not Exist! ");
+            return null;
+        }
+
+        if(!BCrypt.checkpw(password, user.getPassword())){
+            System.out.println("Wrong Password, Please Try Again!");
+            return null;
+        }
+
+        System.out.println("User Has Passed Auth");
+
+        return user;
     }
+
 
     //get all users
     public List<User> getAllUsers() throws SQLException {
@@ -45,11 +55,11 @@ public class UserService {
     }
 
     //get user by id
-    public User getUserById(int user_id) throws SQLException {
+    public User getUserByEmail(String email) throws SQLException {
         try {
-            User user = userDAO.getUserById(String.valueOf(user_id));
+            User user = userDAO.getUserById(String.valueOf(email));
             if (user == null) {
-                System.out.println("No user with ID " + user_id + " was found.");
+                System.out.println("No user with email " + email + " was found.");
             }
             return user;
         } catch (SQLException e) {

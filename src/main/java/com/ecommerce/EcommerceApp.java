@@ -53,6 +53,7 @@ public class EcommerceApp {
                 scanner.nextLine(); // Consume newline character
 
 
+
                 switch (choice) {
                     case 1: // Register
                         System.out.print("Enter username: ");
@@ -85,6 +86,7 @@ public class EcommerceApp {
                         // Register the user using UserService
                         try {
                             userService.registerUser(newUser);
+                            System.out.println("test");
                             System.out.println("User registered successfully!");
                         } catch (SQLException e) {
                             System.err.println("Error registering user: " + e.getMessage());
@@ -92,7 +94,11 @@ public class EcommerceApp {
                         break;
                     case 2:
                         // Handle login and provide role-based access
-                        User loggedInUser = userService.loginUser();
+                        System.out.print("Enter username: ");
+                        String username2 = scanner.nextLine();
+                        System.out.print("Enter password: ");
+                        String password2 = scanner.nextLine();
+                        User loggedInUser = userService.loginUser(username2, password2);
                         if (loggedInUser != null) {
                             handleRoleBasedAccess(scanner, loggedInUser, productService);
                         }

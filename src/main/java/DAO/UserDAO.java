@@ -10,15 +10,20 @@ import java.util.List;
 public class UserDAO {
 
     public void registerUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (username, email, password, role VALUES (?, ?, ?, ?)";
-
+        String sql = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
+            System.out.println("test2");
             preparedStatement.setString(1, user.getUsername());
-            preparedStatement.setString(1, user.getEmail());
-            preparedStatement.setString(1, user.getPassword());
-            preparedStatement.setString(1, user.getRole());
+            preparedStatement.setString(2, user.getEmail());
+            preparedStatement.setString(3, user.getPassword());
+            preparedStatement.setString(4, user.getRole());
+
+            preparedStatement.executeUpdate();
+
+        }catch (IllegalArgumentException e) {
+            System.out.println("Error registering user: " + e.getMessage());
         }
     }
 
