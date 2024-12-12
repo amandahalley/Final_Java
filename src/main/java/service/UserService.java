@@ -25,7 +25,7 @@ public class UserService {
     }
 
     //Login by verifying password
-    public User login(String username, String password) throws SQLException {
+    public User loginUser(String username, String password) throws SQLException {
         //Fetch user from database
         User user = userDAO.getUserByUsername(username);
         if (user != null) {
